@@ -7,7 +7,7 @@ public class VideoCreator {
 
     public static void createVideo() {
         try {
-            String path = "/home/gemelos/Documents/SnapVideo.sh";
+            String path = "/home/gemelos/projects/intelliJ/SnapVideo/SnapVideo.sh";
             String[] cmd = {"sh", path};
             Runtime.getRuntime().exec(cmd);
         }
