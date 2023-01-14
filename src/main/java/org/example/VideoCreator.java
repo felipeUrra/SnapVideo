@@ -27,7 +27,7 @@ public class VideoCreator {
             String[] cmd = {"sh", cmdPath};
             Runtime.getRuntime().exec(cmd);
 
-            System.out.println("Created video");
+            System.out.println("Created video" + "\n");
         }
         catch (IOException ioe) {
             System.out.println(ioe);

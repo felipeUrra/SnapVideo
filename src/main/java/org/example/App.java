@@ -18,23 +18,32 @@ public class App
             System.out.println("1. Create video" + "\n" +
                     "2. To change code path" + "\n" +
                     "3. To change resource path" + "\n" +
-                    "4. Salir" + "\n" +
-                    ":");
+                    "4. Salir");
 
             switch (scanner.nextInt()) {
                 case 1:
                     System.out.println("Code path:");
-                    String path = scanner.next();
+                    scanner.skip("\n");
+                    String path = scanner.nextLine();
                     VideoCreator.setCmdPath(path);
 
                     System.out.println("Resources path:");
-                    VideoCreator.setResourcePath(scanner.next());
+                    VideoCreator.setResourcePath(scanner.nextLine());
 
                     VideoCreator.createVideo();
                     break;
                 case 2:
-                    System.out.println("Code path:");
+                    System.out.println("New code path:");
+                    scanner.skip("\n");
                     VideoCreator.setCmdPath(scanner.nextLine());
+                    break;
+                case 3:
+                    System.out.println("New resource path:");
+                    scanner.skip("\n");
+                    VideoCreator.setResourcePath(scanner.nextLine());
+                    break;
+                case 4:
+                    exit = true;
                     break;
             }
         }
