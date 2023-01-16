@@ -30,7 +30,7 @@ public class App
                     System.out.println("Resources path:");
                     VideoCreator.setResourcePath(scanner.nextLine());
 
-                    VideoCreator.createVideo();
+                    VideoCreator.createVideo(scanner);
                     break;
                 case 2:
                     System.out.println("New code path:");
