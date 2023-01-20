@@ -46,7 +46,7 @@ public class VideoCreator {
                 break;
             case 2:
                 try {
-                    FileOperation.createFileForSimpleVideoWithTransitions(resourcePath, cmdPath);
+                    FileOperation.createFileForSimpleVideoWithCrossfadeEffect(resourcePath, cmdPath);
 
                     String[] cmd = {"sh", cmdPath};
                     Runtime.getRuntime().exec(cmd);
@@ -54,6 +54,18 @@ public class VideoCreator {
                     System.out.println("Created video" + "\n");
                 }
                 catch (IOException ioe) {
+                    System.out.println(ioe);
+                }
+                break;
+            case 3:
+                try {
+                    FileOperation.createFileForVideoWithSpecificDurationsWithOutTransitions(resourcePath, cmdPath);
+
+                    String[] cmd = {"sh", cmdPath};
+                    Runtime.getRuntime().exec(cmd);
+
+                    System.out.println("Created video" + "\n");
+                } catch (IOException ioe) {
                     System.out.println(ioe);
                 }
                 break;
