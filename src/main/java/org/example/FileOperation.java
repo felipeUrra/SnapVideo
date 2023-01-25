@@ -32,21 +32,22 @@ public class FileOperation {
         String extension;
 
         for (int j = 0; j < nameList.length; j++) {
-            int i = nameList[j].getName().lastIndexOf('.');
-            extension = nameList[j].getName().substring(i+1);
+            String[] imageAuxiliar = nameList[j].getName().split("\\.");
+
+            extension = imageAuxiliar[imageAuxiliar.length - 1];
 
             if (extension.equals("jpg") || extension.equals("png")) {
                 name = nameList[j].getName();
 
-                if ("_".equals(nameList[j].getName().substring(7, 8))) {
-                    duration = nameList[j].getName().substring(17, 18);
-                    images.add(new Image(name, duration, extension));
+                imageAuxiliar = nameList[j].getName().split("_");
 
-                } else if ("_".equals(nameList[j].getName().substring(8, 9))) {
-                    duration = nameList[j].getName().substring(18, 19);
-                    images.add(new Image(name, duration, extension));
+                if (imageAuxiliar.length == 3) {
+                    duration = imageAuxiliar[2];
+                    String[] durationAuxiliar = duration.split("\\.");
+                    duration = durationAuxiliar[0];
 
-                } else {
+                    images.add(new Image(name, duration, extension));
+                } else if (imageAuxiliar.length == 2) {
                     images.add(new Image(name, "3", extension));
                 }
             }
@@ -66,7 +67,7 @@ public class FileOperation {
                 if (i == 0) {
                     bufferedWriter.write("cd " + resourcePath + "\n");
                 } else {
-                    bufferedWriter.write("ffmpeg -framerate 1/3 -pattern_type glob -i '*.jpg' -i audio.mp3 -r 25 -pix_fmt yuv420p video.mp4" + "\n");
+                    bufferedWriter.write("ffmpeg -framerate 1/3 -pattern_type glob -i '*.jpg' -i audio.mp3 -r 25 -pix_fmt yuv420p out.mp4" + "\n");
                 }
             }
             bufferedWriter.close();
@@ -99,19 +100,31 @@ public class FileOperation {
                     String ffmpegCmd = "ffmpeg ";
 
                     for (int j = 0; j < xtractImagesData().size(); j++) {
-                        ffmpegCmd += "-loop 1 -t " + xtractImagesData().get(j).getDuration() +
+                        ffmpegCmd += "-loop 1 -t 3" +
                                 " -i " + xtractImagesData().get(j).getName() + " ";
                     }
 
                     ffmpegCmd += "-i audio.mp3 " +
                             "-filter_complex ";
 
-                    ffmpegCmd += "\"[1]format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+4/TB[f0];" +
-                            " [2]format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+8/TB[f1];" +
-                            " [3]format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+12/TB[f2];" +
-                            " [4]format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+16/TB[f3];" +
-                            " [0][f0]overlay[bg1];[bg1][f1]overlay[bg2];[bg2][f2]overlay[bg3];" +
-                            " [bg3][f3]overlay,format=yuv420p[v]\" -map \"[v]\" -map 5:a -shortest -movflags +faststart out.mp4\n";
+                    ffmpegCmd += "\"[1]format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+4/TB[f0];";
+
+                    int numAux = 8;
+                    for (int j = 2; j < xtractImagesData().size(); j++) {
+                        int operAtom = j - 1;
+                        ffmpegCmd += " [" + j + "]format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+" + numAux + "/TB[f" + operAtom + "];";
+                        numAux += 4;
+                    }
+
+                    ffmpegCmd += " [0][f0]overlay[bg1];";
+
+                    for (int j = 1; j < xtractImagesData().size() - 2; j++) {
+                        int operAtom = j + 1;
+                        ffmpegCmd += "[bg" + j + "][f" + j + "]overlay[bg" + operAtom + "];";
+                    }
+
+                    int operAtom = xtractImagesData().size() - 2;
+                    ffmpegCmd += " [bg" + operAtom + "][f" + operAtom + "]overlay,format=yuv420p[v]\" -map \"[v]\" -map " + xtractImagesData().size() + ":a -shortest -movflags +faststart outCE.mp4\n";
 
                     bufferedWriter.write(ffmpegCmd);
                 }
@@ -159,7 +172,7 @@ public class FileOperation {
                     }
                     bufferedWriterInput.close();
 
-                    bufferedWriter.write("ffmpeg -f concat -i input.txt -i audio.mp3 -pix_fmt yuv420p -shortest videoSpec.mp4");
+                    bufferedWriter.write("ffmpeg -f concat -i input.txt -i audio.mp3 -pix_fmt yuv420p -shortest outSD.mp4");
                 }
             }
             bufferedWriter.close();
