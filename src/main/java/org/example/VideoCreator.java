@@ -25,10 +25,10 @@ public class VideoCreator {
 
     public static void createVideo(Scanner scanner) {
         System.out.println("Video type:" + "\n" +
-                "1. Simple video with out transitions" + "\n" +
-                "2. Simple video with transitions" + "\n" +
-                "3. Complex video with out transitions" + "\n" +
-                "4. Complex video with transitions");
+                "1. Simple video without transitions" + "\n" +
+                "2. Simple video with croosfade effect" + "\n" +
+                "3. Complex video without transitions" + "\n" +
+                "4. Complex video with images with varying sizes");
 
         switch (scanner.nextInt()) {
             case 1:
@@ -60,6 +60,18 @@ public class VideoCreator {
             case 3:
                 try {
                     FileOperation.createFileForVideoWithSpecificDurationsWithOutTransitions(resourcePath, cmdPath);
+
+                    String[] cmd = {"sh", cmdPath};
+                    Runtime.getRuntime().exec(cmd);
+
+                    System.out.println("Created video" + "\n");
+                } catch (IOException ioe) {
+                    System.out.println(ioe);
+                }
+                break;
+            case 4:
+                try {
+                    FileOperation.createVideoWithImagesWithVaryingSizes(resourcePath, cmdPath);
 
                     String[] cmd = {"sh", cmdPath};
                     Runtime.getRuntime().exec(cmd);

@@ -157,7 +157,6 @@ public class FileOperation {
                     bufferedWriter.write("cd " + resourcePath + "\n");
                 } else {
                     FileWriter input = null;
-
                     input = new FileWriter(resourcePath + "/input.txt");
 
                     BufferedWriter bufferedWriterInput = new BufferedWriter(input);
@@ -179,6 +178,58 @@ public class FileOperation {
 
             System.out.println("File created satisfactorily");
 
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (cmd == null) {
+                try {
+                    cmd.close();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void createVideoWithImagesWithVaryingSizes(String resourcePath, String cmdPath) {
+        FileWriter cmd = null;
+
+        try {
+            cmd = new FileWriter(cmdPath);
+
+            BufferedWriter bufferedWriter = new BufferedWriter(cmd);
+
+            for (int i = 0; i < 2; i++) {
+                if (i == 0) {
+                    bufferedWriter.write("cd " + resourcePath + "\n");
+                } else {
+                    String ffmpegCmd = "ffmpeg ";
+
+                    for (int j = 0; j < xtractImagesData().size(); j++) {
+                        ffmpegCmd += "-loop 1 -t 5" +
+                                " -i " + xtractImagesData().get(j).getName() + " ";
+                    }
+
+                    ffmpegCmd += "-i audio.mp3 " +
+                            "-filter_complex ";
+
+                    ffmpegCmd += "\"[0:v]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,fade=t=out:st=4:d=1[v0]; ";
+
+                    for (int j = 1; j < xtractImagesData().size(); j++) {
+                        ffmpegCmd += "[" + j + ":v]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,fade=t=in:st=0:d=1,fade=t=out:st=4:d=1[v" + j + "]; ";
+                    }
+
+                    for (int j = 0; j < xtractImagesData().size(); j++) {
+                        ffmpegCmd += "[" + j + "]";
+                    }
+
+                    ffmpegCmd += "concat=n=" + xtractImagesData().size() + ":v=1:a=0,overlay,format=yuv420p[v]\" -map \"[v]\" outIVS.mp4";
+
+                    bufferedWriter.write(ffmpegCmd);
+                }
+            }
+            bufferedWriter.close();
+            System.out.println("File created satisfactorily");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
